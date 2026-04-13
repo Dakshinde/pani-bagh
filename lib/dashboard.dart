@@ -152,101 +152,9 @@ class _DashboardState extends State<Dashboard> {
                     horizontal: 16,
                     vertical: 20,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        elevation: 4,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                flex: 6,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Water Tank Level',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 14),
-                                    SizedBox(
-                                      height: 260,
-                                      child: WaterTank(percent: level),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                flex: 4,
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    _dashboardMetric(
-                                      'Current Level',
-                                      '${level.toStringAsFixed(1)}%',
-                                      Icons.opacity,
-                                      Colors.lightBlue.shade700,
-                                    ),
-                                    const SizedBox(height: 12),
-                                    _dashboardMetric(
-                                      'Alert Status',
-                                      level > 20 ? 'Safe' : 'Low',
-                                      Icons.warning_amber_rounded,
-                                      level > 20 ? Colors.green : Colors.orange,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      GridView.count(
-                        shrinkWrap: true,
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 0.95,
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: [
-                          _pumpStatusCard(),
-                          _connectivityCard(),
-                          _lastUpdatedCard(updatedText),
-                        ],
-                      ),
-                      const SizedBox(height: 28),
-                      const Text(
-                        'Usage Statistics (Live)',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        elevation: 4,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: HistoryChart(recentLevels: history),
-                        ),
-                      ),
-                    ],
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: _buildPageContent(level, updatedText),
                   ),
                 );
               },
@@ -462,6 +370,201 @@ class _DashboardState extends State<Dashboard> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPageContent(double level, String updatedText) {
+    switch (_selectedIndex) {
+      case 0:
+        return _homeView(level, updatedText);
+      case 1:
+      case 2:
+        return _analyticsView();
+      case 3:
+        return _settingsView();
+      default:
+        return _homeView(level, updatedText);
+    }
+  }
+
+  Widget _homeView(double level, String updatedText) {
+    return Column(
+      key: const ValueKey('home'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          elevation: 4,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 6,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Water Tank Level',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      SizedBox(
+                        height: 260,
+                        child: WaterTank(percent: level),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  flex: 4,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _dashboardMetric(
+                        'Current Level',
+                        '${level.toStringAsFixed(1)}%',
+                        Icons.opacity,
+                        Colors.lightBlue.shade700,
+                      ),
+                      const SizedBox(height: 12),
+                      _dashboardMetric(
+                        'Alert Status',
+                        level > 20 ? 'Safe' : 'Low',
+                        Icons.warning_amber_rounded,
+                        level > 20 ? Colors.green : Colors.orange,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        GridView.count(
+          shrinkWrap: true,
+          crossAxisCount: 3,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 0.95,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            _pumpStatusCard(),
+            _connectivityCard(),
+            _lastUpdatedCard(updatedText),
+          ],
+        ),
+        const SizedBox(height: 28),
+        const Text(
+          'Usage Statistics (Live)',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          elevation: 4,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: HistoryChart(recentLevels: history),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _analyticsView() {
+    return Column(
+      key: const ValueKey('analytics'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Detailed Usage Statistics',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Historical water consumption patterns across your industrial facility.',
+          style: TextStyle(color: Colors.grey),
+        ),
+        const SizedBox(height: 24),
+        Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          elevation: 4,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: SizedBox(
+              height: 350,
+              child: HistoryChart(recentLevels: history),
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        _infoCard('Data Accuracy', 'Real-time readings from ultrasonic sensors.', Icons.info_outline),
+      ],
+    );
+  }
+
+  Widget _settingsView() {
+    return Column(
+      key: const ValueKey('settings'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'System Settings',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 24),
+        _settingsTile('Threshold Alerts', 'Set water level limit notifications', Icons.notifications_active),
+        _settingsTile('Sensor Calibration', 'Fine-tune tank distance readings', Icons.settings_input_component),
+        _settingsTile('Connectivity Pool', 'Manage paired BLE/WiFi devices', Icons.bluetooth_searching),
+      ],
+    );
+  }
+
+  Widget _infoCard(String title, String subtitle, IconData icon) {
+    return Card(
+      color: Colors.blue.shade50,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.blue.shade900),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(subtitle),
+      ),
+    );
+  }
+
+  Widget _settingsTile(String title, String subtitle, IconData icon) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.blue.shade900),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: () {},
       ),
     );
   }
