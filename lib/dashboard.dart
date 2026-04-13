@@ -15,6 +15,7 @@ class _DashboardState extends State<Dashboard> {
   final List<double> history = [70, 68, 65, 66, 60, 58, 55];
   bool _pumpOn = true;
   final int _bleStrength = 83;
+  int _selectedIndex = 0;
 
   String _formatTime(DateTime dateTime) {
     final hour = dateTime.hour % 12 == 0 ? 12 : dateTime.hour % 12;
@@ -69,10 +70,10 @@ class _DashboardState extends State<Dashboard> {
                 ],
               ),
             ),
-            _drawerItem(icon: Icons.home, title: 'Home'),
-            _drawerItem(icon: Icons.show_chart, title: 'Analytics'),
-            _drawerItem(icon: Icons.history, title: 'History'),
-            _drawerItem(icon: Icons.settings, title: 'Settings'),
+            _drawerItem(icon: Icons.home, title: 'Home', index: 0),
+            _drawerItem(icon: Icons.show_chart, title: 'Analytics', index: 1),
+            _drawerItem(icon: Icons.history, title: 'History', index: 2),
+            _drawerItem(icon: Icons.settings, title: 'Settings', index: 3),
           ],
         ),
       ),
@@ -101,34 +102,31 @@ class _DashboardState extends State<Dashboard> {
                       ),
                     ),
                     child: showExpandedInfo
-                        ? Stack(
-                            children: [
-                              Positioned(
-                                left: 20,
-                                bottom: 20,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    Text(
-                                      'Live Water Tank Monitoring',
-                                      style: TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 14,
-                                      ),
+                        ? Padding(
+                            padding: const EdgeInsets.only(left: 20, top: 45),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 6.0),
+                                  child: Text(
+                                    'Live Water Tank Monitoring',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 14,
                                     ),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      'Industrial IoT',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                                const Text(
+                                  'Industrial IoT',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
                           )
                         : const SizedBox.shrink(),
                   );
@@ -259,11 +257,42 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _drawerItem({required IconData icon, required String title}) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.blue.shade900),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-      onTap: () => Navigator.of(context).pop(),
+  Widget _drawerItem({
+    required IconData icon,
+    required String title,
+    required int index,
+  }) {
+    final bool isSelected = _selectedIndex == index;
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedIndex = index;
+        });
+        Navigator.of(context).pop();
+      },
+      child: Container(
+        color: isSelected ? Colors.blue.withValues(alpha: 0.1) : Colors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.blue.shade900 : Colors.blue.shade900.withValues(alpha: 0.7),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: isSelected ? Colors.blue.shade900 : Colors.black87,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -335,12 +364,14 @@ class _DashboardState extends State<Dashboard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  _pumpOn ? 'Running' : 'Stopped',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: _pumpOn ? Colors.green : Colors.red,
+                Expanded(
+                  child: Text(
+                    _pumpOn ? 'Running' : 'Stopped',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: _pumpOn ? Colors.green : Colors.red,
+                    ),
                   ),
                 ),
                 Switch(

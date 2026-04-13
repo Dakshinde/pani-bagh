@@ -1,0 +1,14 @@
+{
+    "java.import.project.enabled": false,
+    "java.autobuild.enabled": false,
+    "android.import.project.enabled": false,
+    "java.configuration.updateBuildConfiguration": "disabled",
+    "java.jdt.ls.vmargs": "-Djava.import.gradle.enabled=false",
+    "files.exclude": {
+        "android/": true,
+        "ios/": true,
+        "linux/": true,
+        "macos/": true,
+        "windows/": true
+    }
+}
